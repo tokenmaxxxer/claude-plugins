@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Installs the freelunch plugin for Claude Code.
-# Works with the claude CLI if present; otherwise writes the equivalent
-# configuration directly so the VSCode extension (same ~/.claude config) picks it up.
+# Prefers a real `claude` CLI (standalone, or the binary bundled inside the
+# VSCode extension); falls back to writing ~/.claude/settings.json directly.
 set -u
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
@@ -13,18 +13,31 @@ if [ ! -f "$ROOT/.claude-plugin/marketplace.json" ]; then
   exit 1
 fi
 
-if command -v claude >/dev/null 2>&1; then
-  echo "==> claude CLI found: installing via CLI"
-  if claude plugin marketplace list 2>/dev/null | grep -q "$MARKET"; then
+find_cli() {
+  if command -v claude >/dev/null 2>&1; then
+    command -v claude
+    return
+  fi
+  # The VSCode extension bundles a full CLI; pick the newest version.
+  ls -1d "$HOME"/.vscode-server/extensions/anthropic.claude-code-*/resources/native-binary/claude \
+         "$HOME"/.vscode/extensions/anthropic.claude-code-*/resources/native-binary/claude \
+         2>/dev/null | sort -V | tail -1
+}
+
+CLI=""
+[ -z "${FREELUNCH_SETTINGS_ONLY:-}" ] && CLI="$(find_cli)"
+
+if [ -n "$CLI" ] && [ -x "$CLI" ]; then
+  echo "==> installing via CLI: $CLI"
+  if "$CLI" plugin marketplace list 2>/dev/null | grep -q "$MARKET"; then
     echo "    marketplace '$MARKET' already registered"
   else
-    claude plugin marketplace add "$ROOT" \
-      || (cd "$(dirname "$ROOT")" && claude plugin marketplace add "./$(basename "$ROOT")")
+    "$CLI" plugin marketplace add "$ROOT"
   fi
-  claude plugin install "$PLUGIN@$MARKET" --scope user
-  echo "==> installed $PLUGIN@$MARKET (user scope)"
+  "$CLI" plugin install "$PLUGIN@$MARKET" --scope user
+  echo "==> installed $PLUGIN@$MARKET (user scope). If VSCode is open, reload the window."
 else
-  echo "==> claude CLI not found: writing config for the VSCode extension"
+  echo "==> no claude CLI found (standalone or bundled): writing settings directly"
   python3 - "$ROOT" "$MARKET" "$PLUGIN" <<'PY'
 import json, os, shutil, sys
 
@@ -43,12 +56,13 @@ if os.path.exists(path):
     shutil.copy2(path, path + ".bak")
     print(f"    backup written to {path}.bak")
 
+# Marketplace source type for a local path is "directory" (NOT "local" —
+# an unknown const fails schema validation and disables the whole file).
 settings.setdefault("extraKnownMarketplaces", {})[market] = {
-    "source": {"source": "local", "path": root}
+    "source": {"source": "directory", "path": root}
 }
 
-# enabledPlugins is a record ({"plugin@market": true}), not an array —
-# an array makes the whole settings file fail to parse.
+# enabledPlugins is a record ({"plugin@market": true}), not an array.
 enabled = settings.get("enabledPlugins")
 if isinstance(enabled, list):
     enabled = {k: True for k in enabled}
