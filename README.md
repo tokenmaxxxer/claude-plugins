@@ -46,18 +46,23 @@ Sole exception: purely conversational questions with no file or code work.
 
 ## Install
 
-```
-./install.sh
-```
-
-The script handles both setups. With the `claude` CLI on PATH it registers the local marketplace and installs the plugin via `claude plugin marketplace add` / `claude plugin install` (user scope). With only the VSCode extension it writes the same configuration directly into `~/.claude/settings.json` (`extraKnownMarketplaces` + `enabledPlugins`, which the extension shares with the CLI), backs up the previous settings to `settings.json.bak`, and asks you to reload the VSCode window. It is idempotent — safe to re-run.
-
-No clone needed — straight from GitHub, inside any Claude Code session:
+**With the `claude` CLI** — no clone needed, inside any CLI session:
 
 ```
 /plugin marketplace add tokenmaxxxer/freelunch
 /plugin install freelunch@freelunch
 ```
+
+(or from a shell: `claude plugin marketplace add tokenmaxxxer/freelunch && claude plugin install freelunch@freelunch`)
+
+**VSCode extension only** — the extension's chat does not support `/plugin` commands, so use the installer, which finds the CLI bundled inside the extension and runs the real install through it:
+
+```
+git clone https://github.com/tokenmaxxxer/freelunch.git
+cd freelunch && ./install.sh
+```
+
+Then reload the VSCode window. The installer prefers a PATH `claude`, then the extension's bundled CLI, and as a last resort writes `~/.claude/settings.json` directly (backing up the original). Idempotent — safe to re-run.
 
 ## Temporarily disable
 
