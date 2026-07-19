@@ -18,6 +18,11 @@
       "name": "blueprint",
       "source": "./blueprint",
       "description": "Archetype-based architecture selection from a queryable database: deterministic classify/recommend CLI, anti-pattern checks, and the fan-out contract to freeze before dispatching workers."
+    },
+    {
+      "name": "no-mock",
+      "source": "./no-mock",
+      "description": "Steers deliverables toward production-runnable structure at generation time — real persistence, real integration seams, no silent mocks. Pure direction, no verification machinery."
     }
   ]
 }
