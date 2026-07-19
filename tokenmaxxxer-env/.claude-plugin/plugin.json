@@ -1,0 +1,14 @@
+{
+  "name": "tokenmaxxxer-env",
+  "version": "0.1.0",
+  "description": "One-install tokenmaxxxer environment: pulls in the whole steering stack (freelunch, terse, blueprint, no-mock) as dependencies. Contains no code of its own.",
+  "author": {
+    "name": "Jung Jiwon & Lee Jongkwan"
+  },
+  "dependencies": [
+    "freelunch",
+    "terse",
+    "blueprint",
+    "no-mock"
+  ]
+}
