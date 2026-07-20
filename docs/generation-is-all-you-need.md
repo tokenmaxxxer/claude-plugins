@@ -25,7 +25,7 @@ This is not an argument that verification is unnecessary. It is an argument abou
 
 We build the argument in five moves: the oracle is a moving target (§2); the model cannot verify against it from inside a turn (§3); therefore the layers must separate (§4); separation makes generation cheap and parallel (§5); and cheap parallel generation plus human feedback is the actual convergence mechanism (§6). We then state the conditions under which the thesis holds and fails (§7), report internal experiments (§8), and position against related work (§9).
 
-Three figures carry the intuition: **Figure 1** (§4) contrasts the two architectures — verification fused into the turn vs. given its own layer; **Figure 2** (§6) shows distance-to-oracle vs. cost for each; **Figure 3** (§3) shows why the two operations called "verification" pull in opposite directions. Figures 2 and 3 are schematic — they illustrate the mechanism, not measured data (the measured data is §8).
+Three figures carry the intuition: **Figure 1** (§3) shows what each kind of verification does across rounds; **Figure 2** (§4) contrasts the two architectures — verification fused into the turn vs. given its own layer; **Figure 3** (§6) shows distance-to-oracle vs. cost for each. Figures 1 and 3 are schematic — they illustrate the mechanism, not measured data (the measured data is §8).
 
 ---
 
@@ -54,8 +54,8 @@ This is the empirical core of our thesis. The model cannot verify against an ora
 The conclusion is not "make the verifier better." It is: **the generating turn is the wrong place for the check.**
 
 <figure>
-<img src="assets/figure-3-verification-dynamics.svg" alt="Verification dynamics: intrinsic self-verification drifts down while external feedback converges to the oracle" width="700">
-<em>Figure 3 (schematic, not plotted from data). The two operations both called "verification" pull in opposite directions. Asking the model to judge its own output with no external oracle drifts quality <em>down</em> over rounds (Huang et al. [2]; Stechly et al. [3]); routing the same rounds through human feedback, which carries the oracle, converges quality up. The x-axis is rounds; only the feedback curve is a contraction toward the oracle.</em>
+<img src="assets/figure-1-verification-dynamics.svg" alt="Verification dynamics: intrinsic self-verification fails to improve and sometimes degrades, while external feedback converges to the oracle" width="700">
+<em>Figure 1 (schematic, not plotted from data). The two operations both called "verification" behave differently across rounds. With no external oracle, intrinsic self-verification fails to improve quality and sometimes degrades it — the cited studies measure only 1–3 rounds and find neutral-to-negative effects (Huang et al. [2]; Stechly et al. [3]); the flat, oscillating curve draws exactly that, not a steady decline. Routing the same rounds through human feedback, which carries the oracle, converges quality up. Only the feedback curve is a contraction toward the oracle.</em>
 </figure>
 
 ---
@@ -76,8 +76,8 @@ Two clarifications guard against misreading:
 2. **Steering is not verification.** Shaping the generator's direction *before* it writes — telling it which production structure, which exemplar bar, which secure pattern to reach for — is a generation-layer act that costs only prompt tokens and never inspects output. It reduces the distance the feedback loop must later close, without ever running a check. The distinction is exact: steering moves the *prior*; verification inspects the *sample*.
 
 <figure>
-<img src="assets/figure-1-two-architectures.svg" alt="Two architectures: fused generate-check-repair versus separated generation and verification layers" width="760">
-<em>Figure 1. (A) The generate–check–repair turn tries to reach a human-held, moving oracle from inside a single expensive turn, and stalls below it. (B) The generating layer emits raw candidates cheaply and in parallel; the verification layer above holds the oracle (a human) and closes the gap through feedback across rounds. Same total budget; different topology.</em>
+<img src="assets/figure-2-two-architectures.svg" alt="Where the check runs and which oracle it consults: fused self-check compares to a guessed oracle while the user's real oracle is never consulted; separated layers have the user judge every round and return feedback" width="760">
+<em>Figure 2. Where the check runs, and which oracle it consults. (A) Fused: the self-check inside the turn can only compare the artifact to a guessed oracle rebuilt from the model's own priors; the user's real standard is never consulted during the turn, so passing the internal check does not mean the user will judge the result good. (B) Separated: generation stays below as cheap, raw, parallel rounds; every check is the user — the holder of the real oracle — judging candidates and returning a feedback delta that re-aims the next round. The cost curve of this loop is Figure 3.</em>
 </figure>
 
 ---
@@ -109,8 +109,8 @@ It is tempting to conclude that if cheap parallel generation is good, more of it
 **The two levers multiply, but only one converges.** Speed (parallel generation) and accuracy (feedback) are not substitutes. Cheap fast turns make *more feedback rounds affordable* in a given wall-clock and budget; feedback makes each round *point somewhere better*. Their product is a system that reaches the user's oracle in more, faster, better-aimed iterations than a system that spends the same budget on one expensive, self-verifying, slow turn that still misses. But agent count alone, absent feedback, converges on the *centroid of the pretrained prior* — not on the user.
 
 <figure>
-<img src="assets/figure-2-distance-vs-cost.svg" alt="Distance to the user oracle versus cumulative cost: the fused turn plateaus above the oracle while separated cheap turns plus feedback converge onto it" width="700">
-<em>Figure 2 (schematic, not plotted from data). Same budget on the x-axis. The fused turn buys a few large, expensive steps and stalls above the oracle — its self-check cannot supply the out-of-distribution information the last gap needs, and can regress (Huang et al. [2]). Splitting the budget into many cheap parallel turns, each re-aimed by feedback, spends the same total but keeps closing the distance because every round injects oracle information the model lacked. Parallelism sets the step <em>rate</em>; feedback sets the step <em>direction</em> — only their product reaches the target.</em>
+<img src="assets/figure-3-distance-vs-cost.svg" alt="Distance to the user oracle versus cumulative cost: the fused turn buys a few big steps and plateaus above the oracle, while many cheap feedback rounds keep stepping down onto it" width="700">
+<em>Figure 3 (schematic, not plotted from data). Same budget on the x-axis. The fused turn buys a few large, expensive steps and stalls above the oracle — its self-check cannot supply the out-of-distribution information the last gap needs, and can regress (Huang et al. [2]). Splitting the budget into many cheap parallel turns, each re-aimed by feedback, spends the same total but keeps closing the distance because every round injects oracle information the model lacked. Parallelism sets the step <em>rate</em>; feedback sets the step <em>direction</em> — only their product reaches the target.</em>
 </figure>
 
 ---

@@ -1,0 +1,94 @@
+<svg viewBox="0 0 760 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Where the check runs and which oracle it consults: fused self-check compares to a guessed oracle while the user's real oracle is never consulted; separated layers have the user judge every round and return feedback">
+  <rect x="0" y="0" width="760" height="420" fill="#fbfbfd" stroke="#d9dce3"/>
+  <text x="380" y="24" text-anchor="middle" font-family="sans-serif" font-size="15" font-weight="700" fill="#1a202c">Figure 2. Where does the check run — and which oracle does it consult?</text>
+  <text x="380" y="42" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#4a5568">"oracle" = the standard the user will judge the result by. Only the user has it.</text>
+  <!-- divider -->
+  <line x1="380" y1="54" x2="380" y2="408" stroke="#e2e5ec" stroke-width="1.5"/>
+
+  <!-- ============ Panel A ============ -->
+  <text x="40" y="74" font-family="sans-serif" font-size="13.5" font-weight="700" fill="#c0432b">A. Fused: the check runs inside the turn</text>
+  <rect x="40" y="86" width="300" height="164" rx="10" fill="#fdf0ec" stroke="#c0432b" stroke-width="1.6"/>
+  <text x="52" y="104" font-family="sans-serif" font-size="11" font-weight="700" fill="#9c3320">LLM turn</text>
+  <rect x="60" y="114" width="80" height="32" rx="6" fill="#fff" stroke="#c0432b"/>
+  <text x="100" y="134" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#1a202c">generate</text>
+  <rect x="200" y="114" width="96" height="32" rx="6" fill="#fff" stroke="#c0432b"/>
+  <text x="248" y="134" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#1a202c">self-check</text>
+  <rect x="60" y="192" width="80" height="32" rx="6" fill="#fff" stroke="#c0432b"/>
+  <text x="100" y="212" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#1a202c">repair</text>
+  <!-- guessed oracle -->
+  <rect x="188" y="176" width="126" height="36" rx="8" fill="none" stroke="#c0432b" stroke-width="1.4" stroke-dasharray="5 4"/>
+  <text x="251" y="191" text-anchor="middle" font-family="sans-serif" font-size="10.5" font-weight="700" fill="#c0432b">"guessed oracle"</text>
+  <text x="251" y="205" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#c0432b">rebuilt from the model's priors</text>
+  <!-- flow arrows -->
+  <line x1="140" y1="130" x2="198" y2="130" stroke="#c0432b" stroke-width="1.6" marker-end="url(#ah-r)"/>
+  <line x1="248" y1="146" x2="248" y2="174" stroke="#c0432b" stroke-width="1.4" stroke-dasharray="3 3" marker-end="url(#ah-r)"/>
+  <text x="256" y="164" font-family="sans-serif" font-size="9.5" fill="#c0432b">compares to</text>
+  <line x1="186" y1="194" x2="142" y2="204" stroke="#c0432b" stroke-width="1.6" marker-end="url(#ah-r)"/>
+  <path d="M100 192 Q100 160 96 148" fill="none" stroke="#c0432b" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#ah-r)"/>
+  <text x="120" y="240" font-family="sans-serif" font-size="10.5" fill="#9c3320">loops until the guess is satisfied — cost ≈ 100</text>
+  <!-- severed link to the real oracle -->
+  <line x1="190" y1="250" x2="190" y2="298" stroke="#a0aec0" stroke-width="1.6" stroke-dasharray="5 4"/>
+  <text x="190" y="281" text-anchor="middle" font-family="sans-serif" font-size="15" font-weight="700" fill="#c0432b">✕</text>
+  <text x="204" y="281" font-family="sans-serif" font-size="10.5" fill="#c0432b">never consulted during the turn</text>
+  <!-- the real oracle: the user -->
+  <rect x="90" y="300" width="200" height="48" rx="10" fill="#ecf7f0" stroke="#2f855a" stroke-width="1.6"/>
+  <circle cx="116" cy="318" r="6" fill="#2f855a"/>
+  <path d="M105 336 a11 8 0 0 1 22 0" fill="#2f855a"/>
+  <text x="136" y="319" font-family="sans-serif" font-size="11.5" font-weight="700" fill="#2f855a">USER</text>
+  <text x="136" y="336" font-family="sans-serif" font-size="10.5" fill="#2f855a">holds the real oracle</text>
+  <text x="40" y="382" font-family="sans-serif" font-size="11" fill="#4a5568">The check can only compare the artifact to a guess of the standard.</text>
+  <text x="40" y="400" font-family="sans-serif" font-size="11" fill="#4a5568">If the guess is wrong, passing the check means nothing to the user.</text>
+
+  <!-- ============ Panel B ============ -->
+  <text x="406" y="74" font-family="sans-serif" font-size="13.5" font-weight="700" fill="#2b6cb0">B. Separated: the user's feedback is the check</text>
+  <!-- user / verification layer -->
+  <rect x="406" y="86" width="328" height="56" rx="10" fill="#ecf7f0" stroke="#2f855a" stroke-width="1.6"/>
+  <circle cx="432" cy="107" r="6" fill="#2f855a"/>
+  <path d="M421 125 a11 8 0 0 1 22 0" fill="#2f855a"/>
+  <text x="452" y="107" font-family="sans-serif" font-size="11.5" font-weight="700" fill="#2f855a">USER — verification layer</text>
+  <text x="452" y="124" font-family="sans-serif" font-size="10.5" fill="#2f855a">holds the real oracle · judges candidates · returns feedback Δ</text>
+
+  <!-- rounds -->
+  <text x="458" y="182" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="700" fill="#4a5568">round 1</text>
+  <rect x="416" y="190" width="84" height="56" rx="8" fill="#fff" stroke="#2b6cb0" stroke-width="1.4"/>
+  <rect x="424" y="198" width="20" height="20" rx="4" fill="#eaf1f9" stroke="#2b6cb0"/>
+  <rect x="448" y="198" width="20" height="20" rx="4" fill="#eaf1f9" stroke="#2b6cb0"/>
+  <rect x="472" y="198" width="20" height="20" rx="4" fill="#eaf1f9" stroke="#2b6cb0"/>
+  <text x="458" y="237" text-anchor="middle" font-family="sans-serif" font-size="9.5" fill="#2b6cb0">parallel · raw · cost ≈ 1 each</text>
+
+  <text x="570" y="182" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="700" fill="#4a5568">round 2</text>
+  <rect x="528" y="190" width="84" height="56" rx="8" fill="#fff" stroke="#2b6cb0" stroke-width="1.4"/>
+  <rect x="536" y="198" width="20" height="20" rx="4" fill="#eaf1f9" stroke="#2b6cb0"/>
+  <rect x="560" y="198" width="20" height="20" rx="4" fill="#eaf1f9" stroke="#2b6cb0"/>
+  <rect x="584" y="198" width="20" height="20" rx="4" fill="#eaf1f9" stroke="#2b6cb0"/>
+  <text x="570" y="237" text-anchor="middle" font-family="sans-serif" font-size="9.5" fill="#2b6cb0">re-aimed by Δ1</text>
+
+  <text x="682" y="182" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="700" fill="#4a5568">round 3</text>
+  <rect x="640" y="190" width="84" height="56" rx="8" fill="#fff" stroke="#2b6cb0" stroke-width="1.4"/>
+  <rect x="648" y="198" width="20" height="20" rx="4" fill="#eaf1f9" stroke="#2b6cb0"/>
+  <rect x="672" y="198" width="20" height="20" rx="4" fill="#eaf1f9" stroke="#2b6cb0"/>
+  <rect x="696" y="198" width="20" height="20" rx="4" fill="#eaf1f9" stroke="#2b6cb0"/>
+  <text x="682" y="237" text-anchor="middle" font-family="sans-serif" font-size="9.5" fill="#2b6cb0">re-aimed by Δ2</text>
+  <text x="740" y="222" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#4a5568">⋯</text>
+
+  <!-- zigzag: candidates up, feedback down -->
+  <line x1="442" y1="188" x2="442" y2="146" stroke="#2b6cb0" stroke-width="1.6" marker-end="url(#ah-b)"/>
+  <text x="436" y="168" text-anchor="end" font-family="sans-serif" font-size="10" fill="#2b6cb0">candidates</text>
+  <line x1="492" y1="144" x2="538" y2="184" stroke="#2f855a" stroke-width="1.6" marker-end="url(#ah-g)"/>
+  <text x="524" y="158" font-family="sans-serif" font-size="10" font-weight="700" fill="#2f855a">Δ1</text>
+  <line x1="554" y1="188" x2="554" y2="146" stroke="#2b6cb0" stroke-width="1.6" marker-end="url(#ah-b)"/>
+  <line x1="604" y1="144" x2="650" y2="184" stroke="#2f855a" stroke-width="1.6" marker-end="url(#ah-g)"/>
+  <text x="636" y="158" font-family="sans-serif" font-size="10" font-weight="700" fill="#2f855a">Δ2</text>
+  <line x1="666" y1="188" x2="666" y2="146" stroke="#2b6cb0" stroke-width="1.6" marker-end="url(#ah-b)"/>
+
+  <text x="570" y="278" text-anchor="middle" font-family="sans-serif" font-size="10.5" fill="#2f855a">every check consults the real oracle — because the user does the checking</text>
+
+  <text x="406" y="382" font-family="sans-serif" font-size="11" fill="#4a5568">Below: cheap raw parallel generation. Above: the only judge that counts.</text>
+  <text x="406" y="400" font-family="sans-serif" font-size="11" fill="#4a5568">Each Δ re-aims the next round — the cost curve of this loop is Figure 3.</text>
+
+  <defs>
+    <marker id="ah-r" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#c0432b"/></marker>
+    <marker id="ah-b" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#2b6cb0"/></marker>
+    <marker id="ah-g" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#2f855a"/></marker>
+  </defs>
+</svg>
