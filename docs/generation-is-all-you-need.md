@@ -3,7 +3,7 @@
 
 **Jiwon Jung · Jongkwan Lee**
 
-*A position paper of the `tokenmaxxxer` stack. Draft, 2026-07-20.*
+*A position paper of the `tokenmaxxxer` stack. v0.1, 2026-07-20.*
 
 ---
 
