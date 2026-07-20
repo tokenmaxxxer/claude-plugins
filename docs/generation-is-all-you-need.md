@@ -54,30 +54,7 @@ This is the empirical core of our thesis. The model cannot verify against an ora
 The conclusion is not "make the verifier better." It is: **the generating turn is the wrong place for the check.**
 
 <figure>
-<svg viewBox="0 0 700 340" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Verification dynamics: intrinsic self-verification drifts down while external feedback converges to the oracle">
-  <rect x="0" y="0" width="700" height="340" fill="#fbfbfd" stroke="#d9dce3"/>
-  <text x="350" y="26" text-anchor="middle" font-family="sans-serif" font-size="15" font-weight="700" fill="#1a202c">Figure 3. What each kind of verification does across rounds</text>
-  <!-- axes -->
-  <line x1="70" y1="60" x2="70" y2="285" stroke="#4a5568" stroke-width="1.5"/>
-  <line x1="70" y1="285" x2="650" y2="285" stroke="#4a5568" stroke-width="1.5"/>
-  <text x="60" y="70" text-anchor="end" font-family="sans-serif" font-size="12" fill="#4a5568">high</text>
-  <text x="60" y="283" text-anchor="end" font-family="sans-serif" font-size="12" fill="#4a5568">low</text>
-  <text x="26" y="180" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#4a5568" transform="rotate(-90 26 180)">proximity to user oracle (quality)</text>
-  <text x="360" y="312" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#4a5568">rounds of verification / feedback</text>
-  <!-- oracle line -->
-  <line x1="70" y1="66" x2="650" y2="66" stroke="#2f855a" stroke-width="1.5" stroke-dasharray="6 4"/>
-  <text x="646" y="60" text-anchor="end" font-family="sans-serif" font-size="12" fill="#2f855a">user oracle</text>
-  <!-- external feedback (blue), converging up -->
-  <polyline fill="none" stroke="#2b6cb0" stroke-width="2.6" points="70,175 142,140 214,114 286,96 358,84 430,76 502,71 574,68 646,67"/>
-  <text x="500" y="120" font-family="sans-serif" font-size="12.5" font-weight="700" fill="#2b6cb0">external feedback</text>
-  <text x="500" y="136" font-family="sans-serif" font-size="11.5" fill="#2b6cb0">(human holds the oracle)</text>
-  <!-- intrinsic self-verification (red), drifting down -->
-  <polyline fill="none" stroke="#c0432b" stroke-width="2.6" points="70,175 142,182 214,176 286,192 358,199 430,207 502,212 574,218 646,222"/>
-  <text x="300" y="245" font-family="sans-serif" font-size="12.5" font-weight="700" fill="#c0432b">intrinsic self-verification</text>
-  <text x="300" y="261" font-family="sans-serif" font-size="11.5" fill="#c0432b">(model judges its own output — drifts down)</text>
-  <circle cx="70" cy="175" r="3.5" fill="#1a202c"/>
-  <text x="80" y="167" font-family="sans-serif" font-size="11" fill="#1a202c">same start</text>
-</svg>
+<img src="assets/figure-3-verification-dynamics.svg" alt="Verification dynamics: intrinsic self-verification drifts down while external feedback converges to the oracle" width="700">
 <em>Figure 3 (schematic, not plotted from data). The two operations both called "verification" pull in opposite directions. Asking the model to judge its own output with no external oracle drifts quality <em>down</em> over rounds (Huang et al. [2]; Stechly et al. [3]); routing the same rounds through human feedback, which carries the oracle, converges quality up. The x-axis is rounds; only the feedback curve is a contraction toward the oracle.</em>
 </figure>
 
@@ -99,77 +76,7 @@ Two clarifications guard against misreading:
 2. **Steering is not verification.** Shaping the generator's direction *before* it writes — telling it which production structure, which exemplar bar, which secure pattern to reach for — is a generation-layer act that costs only prompt tokens and never inspects output. It reduces the distance the feedback loop must later close, without ever running a check. The distinction is exact: steering moves the *prior*; verification inspects the *sample*.
 
 <figure>
-<svg viewBox="0 0 760 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Two architectures: fused generate-check-repair versus separated generation and verification layers">
-  <rect x="0" y="0" width="760" height="400" fill="#fbfbfd" stroke="#d9dce3"/>
-  <text x="380" y="26" text-anchor="middle" font-family="sans-serif" font-size="15" font-weight="700" fill="#1a202c">Figure 1. Verification fused into the turn (A) vs. given its own layer (B)</text>
-  <!-- divider -->
-  <line x1="380" y1="44" x2="380" y2="392" stroke="#e2e5ec" stroke-width="1.5"/>
-
-  <!-- Panel A: fused -->
-  <text x="40" y="66" font-family="sans-serif" font-size="13.5" font-weight="700" fill="#c0432b">A. Fused turn — generate · check · repair</text>
-  <rect x="40" y="80" width="300" height="150" rx="10" fill="#fdf0ec" stroke="#c0432b" stroke-width="1.6"/>
-  <text x="190" y="100" text-anchor="middle" font-family="sans-serif" font-size="11.5" fill="#9c3320">one expensive turn</text>
-  <rect x="66" y="112" width="80" height="34" rx="6" fill="#fff" stroke="#c0432b"/>
-  <text x="106" y="134" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#1a202c">generate</text>
-  <rect x="176" y="112" width="80" height="34" rx="6" fill="#fff" stroke="#c0432b"/>
-  <text x="216" y="134" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#1a202c">self-check</text>
-  <rect x="256" y="170" width="70" height="34" rx="6" fill="#fff" stroke="#c0432b"/>
-  <text x="291" y="192" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#1a202c">repair</text>
-  <!-- loop arrows -->
-  <line x1="146" y1="129" x2="174" y2="129" stroke="#c0432b" stroke-width="1.6" marker-end="url(#ah-r)"/>
-  <line x1="216" y1="146" x2="270" y2="168" stroke="#c0432b" stroke-width="1.6" marker-end="url(#ah-r)"/>
-  <path d="M256 187 Q120 200 106 148" fill="none" stroke="#c0432b" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#ah-r)"/>
-  <text x="190" y="222" text-anchor="middle" font-family="sans-serif" font-size="10.5" fill="#9c3320">loop until internal check passes — cost ≈ 100, serial</text>
-  <!-- oracle + gap -->
-  <line x1="40" y1="270" x2="340" y2="270" stroke="#2f855a" stroke-width="1.5" stroke-dasharray="6 4"/>
-  <text x="336" y="264" text-anchor="end" font-family="sans-serif" font-size="11.5" fill="#2f855a">user oracle (moving, often OOD)</text>
-  <line x1="190" y1="230" x2="190" y2="290" stroke="#c0432b" stroke-width="1.6" marker-end="url(#ah-r)"/>
-  <rect x="150" y="292" width="220" height="34" rx="6" fill="#fdf0ec" stroke="#c0432b"/>
-  <text x="260" y="308" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#9c3320">artifact stalls below the oracle</text>
-  <text x="260" y="321" text-anchor="middle" font-family="sans-serif" font-size="10.5" fill="#9c3320">self-check can't reach it — may even degrade</text>
-  <text x="40" y="356" font-family="sans-serif" font-size="11" fill="#4a5568">One big failure at cost 100.</text>
-  <text x="40" y="374" font-family="sans-serif" font-size="11" fill="#4a5568">The turn spends its budget adjudicating an oracle it does not hold.</text>
-
-  <!-- Panel B: separated -->
-  <text x="410" y="66" font-family="sans-serif" font-size="13.5" font-weight="700" fill="#2b6cb0">B. Separated layers — generate below, verify above</text>
-  <!-- verification layer -->
-  <rect x="410" y="80" width="320" height="46" rx="10" fill="#eaf1f9" stroke="#2b6cb0" stroke-width="1.6"/>
-  <text x="570" y="100" text-anchor="middle" font-family="sans-serif" font-size="12.5" font-weight="700" fill="#2b6cb0">VERIFICATION LAYER — human feedback</text>
-  <text x="570" y="116" text-anchor="middle" font-family="sans-serif" font-size="10.5" fill="#2b6cb0">holds the oracle · picks · sends a delta</text>
-  <!-- generation layer: parallel cheap workers -->
-  <text x="410" y="168" font-family="sans-serif" font-size="11.5" fill="#4a5568">GENERATION LAYER — many equal cheap generators, in parallel</text>
-  <g>
-    <rect x="410" y="178" width="52" height="40" rx="6" fill="#fff" stroke="#2b6cb0"/>
-    <rect x="472" y="178" width="52" height="40" rx="6" fill="#fff" stroke="#2b6cb0"/>
-    <rect x="534" y="178" width="52" height="40" rx="6" fill="#fff" stroke="#2b6cb0"/>
-    <rect x="596" y="178" width="52" height="40" rx="6" fill="#fff" stroke="#2b6cb0"/>
-    <rect x="658" y="178" width="52" height="40" rx="6" fill="#fff" stroke="#2b6cb0"/>
-  </g>
-  <text x="436" y="202" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a202c">gen</text>
-  <text x="498" y="202" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a202c">gen</text>
-  <text x="560" y="202" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a202c">gen</text>
-  <text x="622" y="202" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a202c">gen</text>
-  <text x="684" y="202" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1a202c">gen</text>
-  <text x="570" y="234" text-anchor="middle" font-family="sans-serif" font-size="10.5" fill="#2b6cb0">raw, no self-check — cost ≈ 1 each · concurrent</text>
-  <!-- candidates up -->
-  <line x1="570" y1="178" x2="570" y2="128" stroke="#2b6cb0" stroke-width="1.6" marker-end="url(#ah-b)"/>
-  <text x="578" y="150" font-family="sans-serif" font-size="10.5" fill="#2b6cb0">candidates ↑</text>
-  <!-- feedback down -->
-  <path d="M700 126 Q724 160 700 176" fill="none" stroke="#2b6cb0" stroke-width="1.6" marker-end="url(#ah-b)"/>
-  <text x="712" y="152" font-family="sans-serif" font-size="10.5" fill="#2b6cb0">feedback ↓</text>
-  <!-- oracle reached -->
-  <line x1="410" y1="270" x2="730" y2="270" stroke="#2f855a" stroke-width="1.5" stroke-dasharray="6 4"/>
-  <text x="726" y="264" text-anchor="end" font-family="sans-serif" font-size="11.5" fill="#2f855a">user oracle</text>
-  <circle cx="570" cy="270" r="5" fill="#2f855a"/>
-  <text x="570" y="290" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#2f855a">artifact converges onto the oracle across rounds</text>
-  <text x="410" y="356" font-family="sans-serif" font-size="11" fill="#4a5568">Fifty small failures at cost 1 — same budget, but they populate</text>
-  <text x="410" y="374" font-family="sans-serif" font-size="11" fill="#4a5568">the option space the human then selects and steers from.</text>
-
-  <defs>
-    <marker id="ah-r" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#c0432b"/></marker>
-    <marker id="ah-b" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#2b6cb0"/></marker>
-  </defs>
-</svg>
+<img src="assets/figure-1-two-architectures.svg" alt="Two architectures: fused generate-check-repair versus separated generation and verification layers" width="760">
 <em>Figure 1. (A) The generate–check–repair turn tries to reach a human-held, moving oracle from inside a single expensive turn, and stalls below it. (B) The generating layer emits raw candidates cheaply and in parallel; the verification layer above holds the oracle (a human) and closes the gap through feedback across rounds. Same total budget; different topology.</em>
 </figure>
 
@@ -202,32 +109,7 @@ It is tempting to conclude that if cheap parallel generation is good, more of it
 **The two levers multiply, but only one converges.** Speed (parallel generation) and accuracy (feedback) are not substitutes. Cheap fast turns make *more feedback rounds affordable* in a given wall-clock and budget; feedback makes each round *point somewhere better*. Their product is a system that reaches the user's oracle in more, faster, better-aimed iterations than a system that spends the same budget on one expensive, self-verifying, slow turn that still misses. But agent count alone, absent feedback, converges on the *centroid of the pretrained prior* — not on the user.
 
 <figure>
-<svg viewBox="0 0 700 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Distance to the user oracle versus cumulative cost: the fused turn plateaus above the oracle while separated cheap turns plus feedback converge onto it">
-  <rect x="0" y="0" width="700" height="360" fill="#fbfbfd" stroke="#d9dce3"/>
-  <text x="350" y="26" text-anchor="middle" font-family="sans-serif" font-size="15" font-weight="700" fill="#1a202c">Figure 2. Distance to the user oracle vs. cumulative cost</text>
-  <!-- axes -->
-  <line x1="72" y1="56" x2="72" y2="290" stroke="#4a5568" stroke-width="1.5"/>
-  <line x1="72" y1="290" x2="650" y2="290" stroke="#4a5568" stroke-width="1.5"/>
-  <text x="62" y="66" text-anchor="end" font-family="sans-serif" font-size="12" fill="#4a5568">far</text>
-  <text x="62" y="276" text-anchor="end" font-family="sans-serif" font-size="12" fill="#4a5568">at oracle</text>
-  <text x="26" y="175" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#4a5568" transform="rotate(-90 26 175)">distance to user oracle</text>
-  <text x="361" y="318" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#4a5568">cumulative cost / wall-clock  →</text>
-  <!-- oracle baseline -->
-  <line x1="72" y1="278" x2="650" y2="278" stroke="#2f855a" stroke-width="1.5" stroke-dasharray="6 4"/>
-  <text x="646" y="272" text-anchor="end" font-family="sans-serif" font-size="12" fill="#2f855a">user oracle</text>
-  <!-- fused: few big steps, plateau above oracle, slight uptick -->
-  <polyline fill="none" stroke="#c0432b" stroke-width="2.6" points="72,80 168,80 168,168 340,168 340,196 520,196 520,188 650,188"/>
-  <circle cx="72" cy="80" r="3.5" fill="#c0432b"/>
-  <circle cx="168" cy="168" r="3.5" fill="#c0432b"/>
-  <circle cx="340" cy="196" r="3.5" fill="#c0432b"/>
-  <circle cx="520" cy="188" r="3.5" fill="#c0432b"/>
-  <text x="356" y="150" font-family="sans-serif" font-size="12.5" font-weight="700" fill="#c0432b">fused turn (self-verify + repair)</text>
-  <text x="356" y="166" font-family="sans-serif" font-size="11" fill="#c0432b">few big steps · plateaus above oracle · may tick up</text>
-  <!-- separated: many small steps to oracle -->
-  <polyline fill="none" stroke="#2b6cb0" stroke-width="2.6" points="72,80 110,104 148,124 186,142 224,160 262,178 300,196 338,212 376,228 414,242 452,253 490,262 528,269 566,273 604,276 650,277"/>
-  <text x="150" y="250" font-family="sans-serif" font-size="12.5" font-weight="700" fill="#2b6cb0">separated: cheap parallel turns + feedback</text>
-  <text x="150" y="266" font-family="sans-serif" font-size="11" fill="#2b6cb0">many small steps · converges onto the oracle</text>
-</svg>
+<img src="assets/figure-2-distance-vs-cost.svg" alt="Distance to the user oracle versus cumulative cost: the fused turn plateaus above the oracle while separated cheap turns plus feedback converge onto it" width="700">
 <em>Figure 2 (schematic, not plotted from data). Same budget on the x-axis. The fused turn buys a few large, expensive steps and stalls above the oracle — its self-check cannot supply the out-of-distribution information the last gap needs, and can regress (Huang et al. [2]). Splitting the budget into many cheap parallel turns, each re-aimed by feedback, spends the same total but keeps closing the distance because every round injects oracle information the model lacked. Parallelism sets the step <em>rate</em>; feedback sets the step <em>direction</em> — only their product reaches the target.</em>
 </figure>
 

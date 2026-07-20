@@ -1,0 +1,24 @@
+<svg viewBox="0 0 700 340" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Verification dynamics: intrinsic self-verification drifts down while external feedback converges to the oracle">
+  <rect x="0" y="0" width="700" height="340" fill="#fbfbfd" stroke="#d9dce3"/>
+  <text x="350" y="26" text-anchor="middle" font-family="sans-serif" font-size="15" font-weight="700" fill="#1a202c">Figure 3. What each kind of verification does across rounds</text>
+  <!-- axes -->
+  <line x1="70" y1="60" x2="70" y2="285" stroke="#4a5568" stroke-width="1.5"/>
+  <line x1="70" y1="285" x2="650" y2="285" stroke="#4a5568" stroke-width="1.5"/>
+  <text x="60" y="70" text-anchor="end" font-family="sans-serif" font-size="12" fill="#4a5568">high</text>
+  <text x="60" y="283" text-anchor="end" font-family="sans-serif" font-size="12" fill="#4a5568">low</text>
+  <text x="26" y="180" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#4a5568" transform="rotate(-90 26 180)">proximity to user oracle (quality)</text>
+  <text x="360" y="312" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#4a5568">rounds of verification / feedback</text>
+  <!-- oracle line -->
+  <line x1="70" y1="66" x2="650" y2="66" stroke="#2f855a" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="646" y="60" text-anchor="end" font-family="sans-serif" font-size="12" fill="#2f855a">user oracle</text>
+  <!-- external feedback (blue), converging up -->
+  <polyline fill="none" stroke="#2b6cb0" stroke-width="2.6" points="70,175 142,140 214,114 286,96 358,84 430,76 502,71 574,68 646,67"/>
+  <text x="500" y="120" font-family="sans-serif" font-size="12.5" font-weight="700" fill="#2b6cb0">external feedback</text>
+  <text x="500" y="136" font-family="sans-serif" font-size="11.5" fill="#2b6cb0">(human holds the oracle)</text>
+  <!-- intrinsic self-verification (red), drifting down -->
+  <polyline fill="none" stroke="#c0432b" stroke-width="2.6" points="70,175 142,182 214,176 286,192 358,199 430,207 502,212 574,218 646,222"/>
+  <text x="300" y="245" font-family="sans-serif" font-size="12.5" font-weight="700" fill="#c0432b">intrinsic self-verification</text>
+  <text x="300" y="261" font-family="sans-serif" font-size="11.5" fill="#c0432b">(model judges its own output — drifts down)</text>
+  <circle cx="70" cy="175" r="3.5" fill="#1a202c"/>
+  <text x="80" y="167" font-family="sans-serif" font-size="11" fill="#1a202c">same start</text>
+</svg>
