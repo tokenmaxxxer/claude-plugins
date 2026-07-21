@@ -45,7 +45,7 @@ The directive's core rules (v2.5, contract-first width-conditional):
 4. Every fan-out worker runs on Sonnet, launched in the background in a single batch — never synchronous. Workers on mechanical contract-pinned groups run at low reasoning effort; default effort where the unit needs judgment beyond the contract.
 5. Worker prompts are minimal: owned path(s), requirements, and the frozen shared contract. Workers are told explicitly to skip verification.
 6. Fan-outs of 4+ workers dispatch via a Workflow script built from a shared contract template, so the contract is emitted once.
-7. Hedging is reactive only — a straggler at ~2x median finish time gets one replacement racer, never a pre-race of every chunk.
+7. Hedging is reactive only — a straggler at ~2x median finish time (or ~2x the dispatch estimate, for a single delegated worker) gets one liveness probe, then one replacement if it is looping rather than advancing; never a pre-race of every chunk. The probe reads progress, never the worker's output, and retries are capped at one.
 8. Integration is mechanical assembly: each group's output goes to its slot, no rewriting, no cross-checking workers against each other, no review pass, under either mode.
 
 Removed from v1 as refuted by the benchmark: the minimum-3-agents mandate, unconditional fan-out regardless of task width, and naive sub-file fragment splitting as a default technique.

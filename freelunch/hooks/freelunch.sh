@@ -116,6 +116,23 @@
 # on the session's Read/Edit would break the workers too. Rationale-only; not
 # benchmarked.
 #
+# v2.9 (2026-07-21): adds WORKER LIVENESS. The only stall rule was the fan-out
+# hedge (one replacement at ~2x median), which needs several workers to have a
+# median at all — so the v2.6 delegated-solo path, one worker and no timer, had
+# no way to notice a worker stuck in an error loop and would wait for a
+# completion notification that may never come. A probe is now allowed at ~2x the
+# expected duration, and it is liveness only: does it advance or loop, never
+# whether its output is right. Two failure-mode corrections are encoded: a stuck
+# worker is usually DETERMINISTIC (wrong path, missing contract detail, ambiguous
+# brief), so re-dispatching the same brief reproduces the same stall — fix the
+# brief when the probe shows the brief was the defect; and retries are capped at
+# one, after which the unit stops being delegated and the user is told, rather
+# than ground on. Polling is banned: repeated probes pull the worker's failure
+# context into the session, which is the exact cost delegation was buying away.
+# The verification precedence is stated in BOTH texts (the clause and the NEVER
+# list) because inter-directive conflicts otherwise resolve silently.
+# Rationale-only; not benchmarked.
+#
 # To disable: export FREELUNCH_OFF=1
 
 if [ -n "$FREELUNCH_OFF" ]; then
@@ -137,11 +154,13 @@ LEAN SOLO: single pass, no fan-out, no self-verification, no re-reading, no revi
 - NO → INLINE: the turn is answerable from context already present — conversation, judgment, design. Deliver the moment it exists. The conversation itself cannot be delegated; this is the only inline branch.
 Never launder a delegated turn into an inline one by reading the file first and calling the edit "in-context" — the test is whether the tool call is needed at all, not whether its output has already landed in the session.
 
-LEAN FAN-OUT: freeze the contract verbatim first — it travels in every worker prompt. Partition by file/symbol ownership into groups of ~100-200 expected lines (measured optimum), roughly equal expected duration, never more groups than width. Symbol-level workers must start from their frozen export-signature line (measured: prevents the one observed seam-defect class). Contract-pinned mechanical groups dispatch at LOW reasoning effort (measured safe); judgment-needing groups at default. Launch one background worker per group in a single batch as subagent_type freelunch-worker (Sonnet-pinned; any other agent type must carry model: sonnet explicitly) — never run_in_background: false. Worker prompt = owned paths + requirements + frozen contract, nothing else; tell workers to skip verification and deliver raw. 4+ workers → dispatch via a Workflow script built from a shared contract template. Hedge reactively only: one replacement if a worker runs ~2x median; never pre-raced twins. Integration is mechanical placement — no rewriting, no cross-checking. RESEARCH EXCEPTION: search-angle fan-outs integrate through one semantic synthesis pass (dedupe, reconcile, note disagreements as such), never new searches or re-runs.
+LEAN FAN-OUT: freeze the contract verbatim first — it travels in every worker prompt. Partition by file/symbol ownership into groups of ~100-200 expected lines (measured optimum), roughly equal expected duration, never more groups than width. Symbol-level workers must start from their frozen export-signature line (measured: prevents the one observed seam-defect class). Contract-pinned mechanical groups dispatch at LOW reasoning effort (measured safe); judgment-needing groups at default. Launch one background worker per group in a single batch as subagent_type freelunch-worker (Sonnet-pinned; any other agent type must carry model: sonnet explicitly) — never run_in_background: false. Worker prompt = owned paths + requirements + frozen contract, nothing else; tell workers to skip verification and deliver raw. 4+ workers → dispatch via a Workflow script built from a shared contract template. Hedge reactively only: one replacement if a worker runs ~2x median (see WORKER LIVENESS); never pre-raced twins. Integration is mechanical placement — no rewriting, no cross-checking. RESEARCH EXCEPTION: search-angle fan-outs integrate through one semantic synthesis pass (dedupe, reconcile, note disagreements as such), never new searches or re-runs.
+
+WORKER LIVENESS (progress, never correctness): when you dispatch, note the unit's expected duration. If a worker exceeds it — ~2x the median finisher in a fan-out, ~2x your dispatch-time estimate for a single delegated worker — run ONE probe: read its progress output or ask it for a one-line status. Never open the files it is producing and never judge what it has produced; the only question is whether it is advancing or looping. Advancing → leave it alone. Stuck → stop it and re-dispatch ONCE: with a corrected brief if the probe showed the brief was the defect (wrong path, missing contract detail, ambiguity), otherwise the same brief. If the replacement also stalls, stop delegating that unit and say so plainly instead of grinding. One probe per stall — never a polling loop, never a timer-driven check-in: repeated probes pull the worker's failure context into the session and cost exactly the context economy delegation bought. This clause is liveness only and is NOT a verification pass.
 
 MODE RE-DECISION: the tally binds to the deliverable, not the prompt's surface. Re-run STEP 1 on the remaining work when (1) DELIVERABLE BIRTH — a question/discussion/complaint turn is about to become a build: tally before the first Write/Edit, exactly as if the build had been requested directly; or (2) WORK-LIST MATERIALIZATION — a scan, file read, plan expansion, or just-finished unit reveals units the opening tally could not see: stop and re-tally before implementing them. Tally IMPLEMENTATION units, not symptom counts (six pages all fixed by one shared route = width 1-2, stay solo). Completed work never re-counts; each event fires once per discovery; never on a timer.
 
-NEVER: two workers on one unit; any verification agent, review pass, re-read, or extra test run solely to confirm correctness; pausing for mid-task clarification (pick the reasonable default silently); re-running what already exists; fanning out regardless of width or enforcing minimum agent counts (both refuted).
+NEVER: two workers on one unit; any verification agent, review pass, re-read, or extra test run solely to confirm correctness (a WORKER LIVENESS probe is not one of these — it reads progress, never output); pausing for mid-task clarification (pick the reasonable default silently); re-running what already exists; fanning out regardless of width or enforcing minimum agent counts (both refuted).
 
 DELIVER IMMEDIATELY once the mode's output is complete. No polish pass, no extra coverage beyond what was asked, no improvement summaries.
 </freelunch-directive>
