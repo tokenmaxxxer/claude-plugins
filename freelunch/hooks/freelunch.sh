@@ -75,6 +75,21 @@
 # caveats apply; wall-clock includes cross-workflow contention noise.
 # Data: experiments/packing-eval-v2.5.json (research repo).
 #
+# v2.6 (2026-07-21): splits LEAN SOLO by executor. Previously solo meant the
+# conversation session did all width-1 work itself, accumulating every file
+# read, tool-call result, and intermediate reasoning into the long-lived
+# context — which then either hits compaction (info loss) or re-sends that
+# throwaway material every subsequent turn (token waste), and blocks the loop
+# so the user cannot inject input or interrupt without killing the work. The
+# discriminator is now whether a unit CONSUMES DISPOSABLE CONTEXT, not its
+# size or duration: inline only the turns that consume none (present-context
+# reasoning, pure conversation, in-context edits) — those cannot be delegated,
+# since a worker would just re-pay setup and relay the reply back lossily —
+# and delegate everything else to one background freelunch-worker so the
+# session stays a thin orchestrator (interruptible, compaction-resistant,
+# token-lean). Fan-out threshold and the no-verification identity unchanged;
+# this only re-splits the solo branch. Rationale-only; not benchmarked.
+#
 # To disable: export FREELUNCH_OFF=1
 
 if [ -n "$FREELUNCH_OFF" ]; then
@@ -91,7 +106,9 @@ RESEARCH TASKS: width = independent search angles needing sustained digging, not
 
 THRESHOLD RULE (mechanical): width >= 3 AND ~100+ expected lines (or comparable effort) per unit → LEAN FAN-OUT; otherwise LEAN SOLO. Never round a borderline count either way; unknowable volume → estimate from comparable past outputs, not hope.
 
-LEAN SOLO: no subagents, single pass, implement everything directly, deliver the moment it exists in full. No self-verification, no re-reading, no review loop.
+LEAN SOLO: single pass, no fan-out, no self-verification, no re-reading, no review loop. Pick the executor by whether the unit CONSUMES DISPOSABLE CONTEXT — file reads, tool loops, code generation, research digging — that the long-lived conversation session should not accumulate:
+- INLINE (parent executes): the turn consumes no throwaway context — reasoning from what is already in context, a pure-conversation reply, or an edit whose target is already in context. Deliver the moment it exists. You cannot delegate the conversation itself; shipping a present-context reply to a worker only pays setup cost and relays it back lossily.
+- DELEGATED (one background worker): any solo unit that would pull disposable context into the session. Dispatch a SINGLE background Sonnet worker (freelunch-worker) owning the work — never run_in_background: false — so the conversation session stays orchestrator-only: interruptible for new input, out of compaction, never holding the worker's reads/tool output/intermediate reasoning. Worker prompt = owned paths + requirements + any frozen contract; worker skips verification and delivers raw. File-producing work lands on disk — the parent points to it, does not re-echo; a text result relays through the parent once. No second worker, no re-run, no verification pass on what returns.
 
 LEAN FAN-OUT: freeze the contract verbatim first — it travels in every worker prompt. Partition by file/symbol ownership into groups of ~100-200 expected lines (measured optimum), roughly equal expected duration, never more groups than width. Symbol-level workers must start from their frozen export-signature line (measured: prevents the one observed seam-defect class). Contract-pinned mechanical groups dispatch at LOW reasoning effort (measured safe); judgment-needing groups at default. Launch one background Sonnet subagent per group in a single batch — never run_in_background: false. Worker prompt = owned paths + requirements + frozen contract, nothing else; tell workers to skip verification and deliver raw. 4+ workers → dispatch via a Workflow script built from a shared contract template. Hedge reactively only: one replacement if a worker runs ~2x median; never pre-raced twins. Integration is mechanical placement — no rewriting, no cross-checking. RESEARCH EXCEPTION: search-angle fan-outs integrate through one semantic synthesis pass (dedupe, reconcile, note disagreements as such), never new searches or re-runs.
 
