@@ -11,9 +11,13 @@
 # at session start.
 # Kill switch: export WARRANT_OFF=1
 
-if [ -n "$WARRANT_OFF" ]; then
-  exit 0
-fi
+# Off means off: `X_OFF=0` and `X_OFF=false` read as "not off" to a user and to
+# most tooling, but any non-empty value used to disable the hook — the kill switch
+# silently killed it on exactly the spelling meant to keep it alive.
+case "${WARRANT_OFF:-}" in
+  ""|0|false|no|off) ;;
+  *) exit 0 ;;
+esac
 
 cat <<'EOF'
 <warrant-directive priority="high">
@@ -47,6 +51,16 @@ Proposal: docs/proposals/2026-07-22-<slug>.md
 `git log --grep` then answers "what shipped for this proposal" without anyone maintaining an index.
 
 ON LANDING: set `status: landed`. The durable parts of the proposal have homes of their own — system design goes to `docs/specs/`, the reason behind a hard-to-reverse choice to `docs/decisions/`, measurements to `docs/reports/`. `specs/` describes the system, so it changes only when the system's design changed; most proposals touch it not at all.
+
+SEND A HUNTER AT THE TWO EXPENSIVE MOMENTS. Right after the proposal is written, and again right before the work lands, dispatch ONE background agent — `subagent_type: warrant-hunter`, `model: sonnet`, `run_in_background: true` — and carry on without waiting for it. The model is named explicitly because freelunch's enforcement mode denies any worker dispatch that does not carry it, and it cannot see the pin in this agent's own frontmatter. Give it one stance and the diff of that transition. The diff is the seed, not the fence: it names the pattern to hunt, and the hunter follows that pattern wherever in the repository it was copied to.
+
+Take the stance at index `(dispatch count mod 5)`, counting from `.warrant-hunt.count` — never the one that seems apt. The apt-seeming stance is the one the code you just read suggested, so it probes only what that code already knows about itself, and rotating by hand collapses into a checklist:
+0. assume the gate just touched is bypassable — find the bypass
+1. assume this change and another plugin's rule cancel each other — find the pair
+2. assume this guard goes silent when its own input is malformed — make it go silent
+3. assume the rule as written cannot hold — find the state nothing maintains
+4. assume the write set cannot carry this work — find the path the build will need that the proposal does not list
+It returns one reproduced finding or nothing. A finding lands in `docs/reports/` and reaches the user at the next turn boundary, in one line; a hunter dispatched before landing reports into the landing exchange, because that is the last moment the finding is cheap. Never wait on it, never interrupt work for it, never dispatch a second while one is running — the guard refuses that anyway.
 
 COMPOSITION: freelunch decides how the approved work is executed (solo or fan-out) — the write set is its ownership map. doctrine decides where documents land. This directive decides only what may begin and when.
 

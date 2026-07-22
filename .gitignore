@@ -1,1 +1,7 @@
 experiments/
+
+# warrant hunter runtime state: single-flight lock and per-repository dispatch
+# count. Local to a working copy, and the count is what the stance rotation
+# indexes off — committing it would hand every clone the same rotation phase.
+.warrant-hunt.lock
+.warrant-hunt.count
