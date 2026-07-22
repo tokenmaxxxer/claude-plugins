@@ -52,11 +52,24 @@ NEVER:
 </no-footgun-directive>
 EOF
 
+# A rules file that exists but will not read is the dangerous case: an empty
+# block reads as "this project adds no rules". Say what happened instead.
 for f in "$HOME/.claude/no-footgun.md" "./.claude/no-footgun.md"; do
-  if [ -f "$f" ]; then
-    echo "<no-footgun-project-rules src=\"$f\">"
-    cat "$f"
+  if [ -e "$f" ] && [ ! -f "$f" ]; then
+    echo "<no-footgun-project-rules src=\"$f\" status=\"unreadable\">"
+    echo "This path exists but is not a readable file (directory, or a symlink to nothing)."
+    echo "Project rules that were meant to apply are NOT in effect. Say so before relying on them."
     echo "</no-footgun-project-rules>"
+  elif [ -f "$f" ]; then
+    if [ -r "$f" ] && contents="$(cat "$f" 2>/dev/null)"; then
+      echo "<no-footgun-project-rules src=\"$f\">"
+      printf '%s\n' "$contents"
+      echo "</no-footgun-project-rules>"
+    else
+      echo "<no-footgun-project-rules src=\"$f\" status=\"unreadable\">"
+      echo "This rules file could not be read (permissions). Its rules are NOT in effect."
+      echo "</no-footgun-project-rules>"
+    fi
   fi
 done
 

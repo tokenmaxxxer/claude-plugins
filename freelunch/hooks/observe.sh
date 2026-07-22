@@ -66,8 +66,17 @@ try:
     os.makedirs(os.path.dirname(log_path), exist_ok=True)
     with open(log_path, "a") as f:
         f.write(json.dumps(row, ensure_ascii=False) + "\n")
-except Exception:
-    pass
+except Exception as exc:
+    # An empty observation log otherwise reads as "no dispatches happened".
+    # Report once per session rather than letting the record go quiet.
+    marker = log_path + ".unwritable"
+    if not os.path.exists(marker):
+        try:
+            open(marker, "a").close()
+        except Exception:
+            pass
+        print("freelunch: observation log %s is not writable (%s); dispatches are going "
+              "unrecorded." % (log_path, exc), file=sys.stderr)
 
 REASONS = {
     "sync_agent_dispatch": (

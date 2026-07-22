@@ -49,6 +49,7 @@ Either way you get the `tokenmaxxxer-env` bundle, whose dependencies pull in the
 | [scout](scout/) | Pre-build reconnaissance (Camp benchmarking + Kano + saturation stop): finds best-in-class exemplars and the category's must-be baseline, compresses them into a scout brief that steers the build. Measured: restores the must-be features baseline builds systematically omit. |
 | [no-footgun](no-footgun/) 🔒 | Direction-only security steering: names the threat patterns for the surface being built (injection, deserialization, XSS, secrets, paths, SSRF, IDOR) so the secure pattern is chosen at write time. Surface-gated, cascading custom rules, zero review passes. Unbenchmarked as of v0.1.0. |
 | [doctrine](doctrine/) 📁 | Documentation placement: every document lives in one of six lifetime-based buckets under `docs/` (`decisions/`, `handbooks/`, `reports/`, `specs/`, `proposals/`, `_assets/`). A directive classifies at write time; a `PreToolUse` gate refuses writes that land under `docs/` outside them. Unbenchmarked as of v0.1.0. |
+| [warrant](warrant/) 🔒 | Work-unit protocol: a proposal states the request, constraints, and the write set before any code is written; approval freezes that set and the build then runs uninterrupted. A `PreToolUse` gate refuses edits outside the set and commits without the `Proposal:` trailer; `SessionStart` rebuilds state from the repository so an interrupted unit survives the session. Unbenchmarked as of v0.1.0. |
 | [tokenmaxxxer-env](tokenmaxxxer-env/) | One-install bundle: pulls the whole stack in as dependencies. |
 
 ## Team rollout
@@ -74,5 +75,5 @@ Prefer a subset? Enable individual plugins instead (`"terse@tokenmaxxxer": true`
 
 - `install.sh` — the one-shot installer described above.
 - `.claude-plugin/marketplace.json` — the marketplace manifest.
-- `freelunch/`, `terse/`, `blueprint/`, `no-mock/`, `scout/`, `no-footgun/`, `doctrine/`, `tokenmaxxxer-env/` — one directory per plugin, each with its own README and benchmark notes.
+- `freelunch/`, `terse/`, `blueprint/`, `no-mock/`, `scout/`, `no-footgun/`, `doctrine/`, `warrant/`, `tokenmaxxxer-env/` — one directory per plugin, each with its own README and benchmark notes.
 - `docs/` — follows the doctrine this repo ships: documents live in lifetime buckets (`reports/` here), attachments in `_assets/`. `experiments/` is a benchmark harness whose markdown is fixture and protocol input, not documentation, so `.claude/settings.json` exempts it via `DOCTRINE_ALLOW`.

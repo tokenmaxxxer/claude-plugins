@@ -1,7 +1,7 @@
 {
   "name": "tokenmaxxxer-env",
-  "version": "0.3.10",
-  "description": "One-install tokenmaxxxer environment: pulls in the whole steering stack (freelunch, terse, blueprint, no-mock, scout, no-footgun, doctrine) as dependencies. Contains no code of its own.",
+  "version": "0.3.11",
+  "description": "One-install tokenmaxxxer environment: pulls in the whole steering stack (freelunch, terse, blueprint, no-mock, scout, no-footgun, doctrine, warrant) as dependencies. Contains no code of its own.",
   "author": {
     "name": "Jung Jiwon & Lee Jongkwan"
   },
@@ -12,6 +12,7 @@
     "no-mock",
     "scout",
     "no-footgun",
-    "doctrine"
+    "doctrine",
+    "warrant"
   ]
 }

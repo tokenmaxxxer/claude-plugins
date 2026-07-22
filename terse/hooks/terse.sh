@@ -34,8 +34,13 @@ case "$LEVEL" in
   ultra)
     STYLE="LEVEL ultra: telegraphic. Sentence fragments, no articles or filler in English; in Korean drop everything except the minimum particles needed to keep subject/object unambiguous. One line per point. Prefer a bare table or list over prose whenever the content allows."
     ;;
-  *)
+  full|"")
     STYLE="LEVEL full: no pleasantries, no preamble, no restating the question, no offering follow-up work. Sentence fragments are fine where unambiguous. In Korean, keep particles that carry case or negation — dropping them can flip meaning; compress by deleting words, not by mangling grammar."
+    ;;
+  *)
+    STYLE="LEVEL full: no pleasantries, no preamble, no restating the question, no offering follow-up work. Sentence fragments are fine where unambiguous. In Korean, keep particles that carry case or negation — dropping them can flip meaning; compress by deleting words, not by mangling grammar.
+
+NOTE: \`${STATE_FILE}\` contains \`${LEVEL}\`, which is not one of off/lite/full/ultra. Full is in effect. Tell the user their level setting is being ignored."
     ;;
 esac
 

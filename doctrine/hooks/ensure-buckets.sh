@@ -34,6 +34,7 @@ docs="$root/docs"
 [ -e "$docs" ] && [ ! -d "$docs" ] && exit 0
 
 created=""
+failed=""
 while IFS='|' read -r bucket blurb; do
   [ -n "$bucket" ] || continue
   target="$docs/$bucket"
@@ -42,7 +43,10 @@ while IFS='|' read -r bucket blurb; do
     continue
   fi
   if [ ! -d "$target" ]; then
-    mkdir -p "$target" 2>/dev/null || continue
+    if ! mkdir -p "$target" 2>/dev/null; then
+      failed="$failed $bucket"
+      continue
+    fi
     created="$created $bucket"
   fi
   if [ ! -e "$target/README.md" ]; then
@@ -56,6 +60,10 @@ specs|Design and specification. Updated in the same PR as the code.
 proposals|Not adopted yet — proposals, drafts, RFCs.
 _assets|Images and attachments. The underscore marks it as not a document class.
 BUCKETS
+
+if [ -n "$failed" ]; then
+  echo "doctrine: could not create docs/ buckets —$failed (permissions?). Documents have nowhere to land."
+fi
 
 if [ -n "$created" ]; then
   echo "doctrine: created docs/ buckets —$created. Documentation goes in one of the six, chosen by lifetime."

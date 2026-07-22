@@ -40,6 +40,11 @@
       "description": "Documentation placement doctrine: six lifetime-based buckets under docs/, created on session start, a directive that classifies at write time and records decisions/measurements as they happen, and a PreToolUse gate refusing writes under docs/ outside them."
     },
     {
+      "name": "warrant",
+      "source": "./warrant",
+      "description": "Work-unit protocol: one approval gate at the front, then uninterrupted execution. A proposal states the request, the constraints, and the write set; approval freezes it; a PreToolUse gate refuses edits outside it and commits without the Proposal: trailer; SessionStart rebuilds state from the repository."
+    },
+    {
       "name": "tokenmaxxxer-env",
       "source": "./tokenmaxxxer-env",
       "description": "One-install environment bundle: installs the whole tokenmaxxxer steering stack via dependencies."

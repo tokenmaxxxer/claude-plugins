@@ -48,20 +48,29 @@ if [ -n "$CLI" ] && [ -x "$CLI" ]; then
   # auto-install a dependency ADDED to an already-installed bundle, so relying
   # on bundle-side resolution breaks upgrades; explicit installs are idempotent
   # and make "re-run the installer" the fix for every dependency error.
-  for plugin in freelunch terse blueprint no-mock scout no-footgun doctrine; do
-    "$CLI" plugin install "$plugin@$MARKET" --scope user
+  # A failed install is recorded rather than shrugged off: the closing "installed
+  # the full stack" line used to print no matter what happened above it.
+  install_failed=""
+  for plugin in freelunch terse blueprint no-mock scout no-footgun doctrine warrant; do
+    "$CLI" plugin install "$plugin@$MARKET" --scope user || install_failed="$install_failed $plugin"
   done
-  "$CLI" plugin install "$BUNDLE@$MARKET" --scope user
+  "$CLI" plugin install "$BUNDLE@$MARKET" --scope user || install_failed="$install_failed $BUNDLE"
   # Then update each to the marketplace's latest. `install` on an already-present
   # plugin may no-op, so after the marketplace refresh an explicit `update` is
   # what actually pulls a newer version (e.g. freelunch 0.2.10 -> 0.2.11).
   # Updating the bundle alone would not move its unpinned dependencies, so update
   # each plugin explicitly, same list as the install loop.
-  for plugin in freelunch terse blueprint no-mock scout no-footgun doctrine; do
+  for plugin in freelunch terse blueprint no-mock scout no-footgun doctrine warrant; do
     "$CLI" plugin update "$plugin@$MARKET" || true
   done
   "$CLI" plugin update "$BUNDLE@$MARKET" || true
-  echo "==> installed $BUNDLE@$MARKET and the full stack."
+  if [ -n "$install_failed" ]; then
+    echo "==> FAILED to install:$install_failed"
+    echo "    The rest of the stack is installed. Re-run this script — it is idempotent —"
+    echo "    or install the failures individually with: $CLI plugin install <name>@$MARKET --scope user"
+  else
+    echo "==> installed $BUNDLE@$MARKET and the full stack."
+  fi
 else
   echo "==> no claude CLI found (standalone or bundled): writing settings directly"
   python3 - "$MARKET" "$BUNDLE" "$SETTINGS_SOURCE_JSON" <<'PY'
