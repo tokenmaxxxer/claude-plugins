@@ -22,7 +22,25 @@ Classification is by lifetime, not topic. One incident produces a postmortem in
 `reports/`, an operational rule in `handbooks/`, and a structural decision in
 `decisions/` — three documents, three lifetimes, linked to each other.
 
-## Two layers
+## Three layers
+
+**`SessionStart` bucket creation** — creates the six under `docs/` when they are
+missing, each with a one-line `README.md` naming what it holds.
+
+This exists because of a measured failure. In a repository with no `docs/` tree,
+the directive alone did not get documents written: four headless runs on a task
+that introduced an environment variable produced no document at all, across four
+phrasings of the rule. The same task in a repository whose buckets already
+existed, with one prior decision record visible, produced a decision record
+unprompted. An empty repository reads as "this project does not keep
+documentation" — the buckets are what makes the practice visible.
+
+It is the only place in the stack that writes to your repository, so it writes
+as little as possible: `mkdir -p` for missing buckets (an existing one is a
+no-op, contents and mtime untouched), a bucket `README.md` only when absent,
+nothing outside `docs/`, nothing removed or overwritten, no network. It skips
+entirely outside a git repository, when `docs/` is a file, or when `docs/` is a
+symlink.
 
 **`UserPromptSubmit` directive** — steers the judgment: documentation goes in
 `docs/`, in the bucket its lifetime picks; the six exist before anything is

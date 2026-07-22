@@ -37,7 +37,7 @@
     {
       "name": "doctrine",
       "source": "./doctrine",
-      "description": "Documentation placement doctrine: six lifetime-based buckets under docs/, a directive that classifies at write time, and a PreToolUse gate that refuses writes landing under docs/ outside them. Scoped to docs/; no doc audits, no post-hoc review."
+      "description": "Documentation placement doctrine: six lifetime-based buckets under docs/, created on session start, a directive that classifies at write time and records decisions/measurements as they happen, and a PreToolUse gate refusing writes under docs/ outside them."
     },
     {
       "name": "tokenmaxxxer-env",

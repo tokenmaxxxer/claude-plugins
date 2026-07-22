@@ -20,9 +20,19 @@ cat <<'EOF'
 <doctrine-directive priority="high">
 This directive governs `docs/` — how the repository's documentation is organized there, and when it is updated. Documentation belongs in `docs/`: when a turn produces a document, that is where it goes. Nothing outside `docs/` is this directive's business.
 
-SURFACE GATE: apply only when the turn (a) writes or edits a document, or (b) changes code in a way that makes an existing document false. If neither applies — code with no doc consequence, conversation, config, throwaway analysis — this directive is inert: skip it entirely.
+SURFACE GATE: apply only when the turn (a) writes or edits a document, (b) changes code in a way that makes an existing document false, or (c) hits one of the WRITE THE DOCUMENT THE WORK PRODUCED triggers below — a hard-to-reverse choice, a measurement that produced numbers, or a change to how the system is operated. If none apply — routine code with no doc consequence, conversation, config, throwaway analysis — this directive is inert: skip it entirely.
 
 REPOSITORY OVERRIDE: if the repository has its own `docs/README.md`, that file is the doctrine and outranks everything below — read it and follow it.
+
+WRITE THE DOCUMENT THE WORK PRODUCED. These documents are not extra scope added to the request and not a deliverable handed to the user — they are the working record this doctrine requires, and their reader is a later session that has none of this turn's context. Not writing one is not restraint; it is dropping state the next turn will have to guess at. So when one of these fires, write it in the same turn, before reporting back — never batched at the end, never offered as a suggestion, never deferred for permission:
+- A hard-to-reverse choice was settled — a library, format, schema, protocol, storage backend, or boundary picked over an alternative. Write `decisions/`: what was chosen, over what, why. A few lines. This holds even when the user dictated the choice: the reason is what evaporates.
+- Tests, a benchmark, or an investigation were run and produced results. Write `reports/` while the output is in hand — what was run, what came back, what it means — and report from that document rather than only in the reply. A result that lives only in a chat message is gone next session.
+- How the system is operated changed — a new environment variable, dependency, migration, setup or deploy step, or a runbook that is now wrong. Write or update `handbooks/`.
+Keep each to what a reader six months out needs, and name the document you wrote in the reply.
+
+READ BEFORE DECIDING: when work touches an area, `decisions/` and `handbooks/` are the first place to look for what was already settled — that is what they are for. Do not re-decide something `decisions/` already answers; follow it, or record a new decision that supersedes it by name.
+
+NOT A TRIGGER, and writing here is the scatter this doctrine prevents: routine code changes, bugfixes, refactors, anything the code, types, tests, or commit message already state, and above all a summary of what this session did. Session recaps belong in the reply, never in `docs/`.
 
 THE SIX BUCKETS. Every repository document lives under `docs/` in exactly one of:
 - `decisions/` — why a hard-to-reverse choice was made, fixed at the moment of the decision
