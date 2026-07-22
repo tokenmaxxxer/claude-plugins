@@ -31,6 +31,14 @@ STANDING REQUEST FROM THE USER: in this repository the channel between me — th
 
 SURFACE GATE: applies when a turn would (a) report progress or a result, (b) need a decision from me, or (c) hand work to or trigger another agent. Reading, analysis, and plain conversation that is not a report are outside it — answer those directly. Once inside, git is the only channel until the work terminates on the remote.
 
+ORIENT BEFORE YOU ACT — when a git event woke this run, first establish WHAT it woke you to do, and read it out of git, not out of memory. You did not choose to start; an event did, and the reason lives in that event plus the committed state. SessionStart (state.sh) has already listed the units parked on the oracle; the committed `.dispatch/<unit>.decision.md` markers are your index — each names its unit, its PR, and the question that was pending, so reading the live thread is a lookup, not a search. Run this in order and stop at the first that matches:
+1. A DECISION YOU PARKED WAS ANSWERED — for each unit state.sh named, read its `dispatch:awaiting-oracle` PR thread; if the oracle replied under your `<dispatch:decision>` marker, THIS is your job: apply the answer, remove the marker with `git rm`, and continue that unit.
+2. A FEEDBACK DELTA landed — a new review comment on an open PR re-aims the next revision of that unit; read it and produce the revision.
+3. CI FAILED on a unit — diagnose from the run, fix, push.
+4. A NEW ISSUE OR REQUEST — scope it as a new unit (a warrant proposal first, where warrant is present).
+5. A MERGE OR CLOSE landed — that unit is done; begin the named downstream unit if there is one, else stop.
+Earlier rules win: an answered decision is resumed before new intent is taken on. NEVER act on a guess about why you woke — a wrong guess spends the run on the wrong unit and reports to no one. If git and the triggering event do not settle the purpose, push one line to the remote saying you could not orient, and stop.
+
 REPORT BY LIFETIME — one mutable surface plus discrete settling points, the same lifetime split doctrine applies to documents:
 - LIVE STATUS (short-lived) -> edit ONE surface in place, never append: the PR body checklist, or `.dispatch/status.md` on the branch. Progress never becomes a new comment, and never a commit per thought.
 - INCREMENT (medium) -> the commit message; the branch groups the commits.
@@ -40,7 +48,7 @@ NEED A DECISION FROM ME? DELIVER IT TO THE REMOTE AND STOP — never ask in chat
 1. Write `.dispatch/<unit>.decision.md` with frontmatter `status: awaiting`, the question, and the options; COMMIT and PUSH it. This is the git-native truth a fresh session rebuilds the parked state from, with no API call.
 2. Put the question on the unit's PR as a comment and add the `dispatch:awaiting-oracle` label — the subscribable surface I and the runner watch.
 3. END THE RUN. You are not parked until the push and the comment have SUCCEEDED; before that you have asked no one and must not stop as if you had.
-My answer arrives as a remote git event that triggers a FRESH run. That run reads the answer, removes the marker, and continues. You never answer, resolve, merge, or close your own decision request — that is my act, and git permissions, not you, enforce it.
+My answer arrives as a remote git event that triggers a FRESH run — which orients by rule 1 above, reads the answer, removes the marker, and continues. You never answer, resolve, merge, or close your own decision request — that is my act, and git permissions, not you, enforce it.
 
 TERMINATE ON THE REMOTE, always. Every triggered run ends by leaving its whole outcome as a remote git mutation and nothing in chat. Four shapes, all remote:
 - PRODUCED   -> push commits / update the PR.
@@ -59,6 +67,7 @@ COMPOSITION:
 - A warrant HUNTER's finding follows this directive: its record is a pushed report file; its finding is a PR comment, or a decision request with `dispatch:awaiting-oracle` when it must block the merge — never a chat one-liner, and never a value that lives only in the parent's context.
 
 NEVER:
+- acting before you have oriented — on a git-triggered run, establish from git and the triggering event WHAT you were woken to do before you change anything.
 - asking in chat (an AskUserQuestion modal, or a question in the reply) when the decision belongs on the remote.
 - idling in-process to "wait" for me; deliver the blocking state to the remote and terminate the run.
 - treating a run as parked before the push and the comment have succeeded.

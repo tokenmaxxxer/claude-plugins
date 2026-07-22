@@ -29,10 +29,13 @@ session; git can. dispatch makes the agent speak only through git, so:
 
 ## What it does
 
-- **Directive** (`UserPromptSubmit`) — the judgment half: report by lifetime (one
-  mutable status surface plus discrete settling points), deliver a decision to
-  the remote and stop, terminate on the remote in one of four shapes
-  (produced / parked / in progress / dead-end), and `report == trigger`.
+- **Directive** (`UserPromptSubmit`) — the judgment half: orient before acting (a
+  git-triggered run establishes from git and the triggering event what it was
+  woken to do, by a deterministic precedence — answered decision, feedback delta,
+  CI failure, new intent, merge/close), report by lifetime (one mutable status
+  surface plus discrete settling points), deliver a decision to the remote and
+  stop, terminate on the remote in one of four shapes (produced / parked / in
+  progress / dead-end), and `report == trigger`.
 - **decision-lock** (`PreToolUse`) — the oracle boundary: refuses a second open
   decision request, refuses mutating an existing marker (you do not answer your
   own question), and refuses a merge while a unit is parked.
