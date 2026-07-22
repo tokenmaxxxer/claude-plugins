@@ -49,6 +49,9 @@ SKIP_DIRS = (
     "node_modules", "vendor", "dist", "build", "target", "out",
     "venv", ".venv", "site-packages", "coverage",
 )
+# Markdown that is a definition the platform loads by path, not a document:
+# Claude Code skills, subagents, and slash commands; prompt templates.
+MANIFEST_DIRS = ("skills", "agents", "commands", "hooks", "prompts", "templates")
 
 
 def allow():
@@ -131,6 +134,8 @@ else:
         allow()
     # README.md is the one filename that means "this directory, explained".
     if name == "README.md":
+        allow()
+    if any(d in MANIFEST_DIRS for d in directories):
         allow()
     if not directories and name in ROOT_FILES:
         allow()

@@ -1,0 +1,5 @@
+{
+  "env": {
+    "DOCTRINE_ALLOW": "experiments"
+  }
+}

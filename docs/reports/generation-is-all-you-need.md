@@ -54,7 +54,7 @@ This is the empirical core of our thesis. The model cannot verify against an ora
 The conclusion is not "make the verifier better." It is: **the generating turn is the wrong place for the check.**
 
 <figure>
-<img src="assets/figure-1-verification-dynamics.svg" alt="Verification dynamics: intrinsic self-verification fails to improve and sometimes degrades, while external feedback converges to the oracle" width="700">
+<img src="../_assets/figure-1-verification-dynamics.svg" alt="Verification dynamics: intrinsic self-verification fails to improve and sometimes degrades, while external feedback converges to the oracle" width="700">
 <em>Figure 1 (schematic, not plotted from data). The two operations both called "verification" behave differently across rounds. With no external oracle, intrinsic self-verification fails to improve quality and sometimes degrades it — the cited studies measure only 1–3 rounds and find neutral-to-negative effects (Huang et al. [2]; Stechly et al. [3]); the flat, oscillating curve draws exactly that, not a steady decline. Routing the same rounds through human feedback, which carries the oracle, converges quality up. Only the feedback curve is a contraction toward the oracle.</em>
 </figure>
 
@@ -76,7 +76,7 @@ Two clarifications guard against misreading:
 2. **Steering is not verification.** Shaping the generator's direction *before* it writes — telling it which production structure, which exemplar bar, which secure pattern to reach for — is a generation-layer act that costs only prompt tokens and never inspects output. It reduces the distance the feedback loop must later close, without ever running a check. The distinction is exact: steering moves the *prior*; verification inspects the *sample*.
 
 <figure>
-<img src="assets/figure-2-two-architectures.svg" alt="Where the check runs and which oracle it consults: fused self-check compares to a guessed oracle while the user's real oracle is never consulted; separated layers have the user judge every round and return feedback" width="760">
+<img src="../_assets/figure-2-two-architectures.svg" alt="Where the check runs and which oracle it consults: fused self-check compares to a guessed oracle while the user's real oracle is never consulted; separated layers have the user judge every round and return feedback" width="760">
 <em>Figure 2. Where the check runs, and which oracle it consults. (A) Fused: the self-check inside the turn can only compare the artifact to a guessed oracle rebuilt from the model's own priors; the user's real standard is never consulted during the turn, so passing the internal check does not mean the user will judge the result good. (B) Separated: generation stays below as cheap, raw, parallel rounds; every check is the user — the holder of the real oracle — judging candidates and returning a feedback delta that re-aims the next round. The cost curve of this loop is Figure 3.</em>
 </figure>
 
@@ -109,7 +109,7 @@ It is tempting to conclude that if cheap parallel generation is good, more of it
 **The two levers multiply, but only one converges.** Speed (parallel generation) and accuracy (feedback) are not substitutes. Cheap fast turns make *more feedback rounds affordable* in a given wall-clock and budget; feedback makes each round *point somewhere better*. Their product is a system that reaches the user's oracle in more, faster, better-aimed iterations than a system that spends the same budget on one expensive, self-verifying, slow turn that still misses. But agent count alone, absent feedback, converges on the *centroid of the pretrained prior* — not on the user.
 
 <figure>
-<img src="assets/figure-3-distance-vs-cost.svg" alt="Distance to the user oracle versus cumulative cost: the fused turn buys a few big steps and plateaus above the oracle, while many cheap feedback rounds keep stepping down onto it" width="700">
+<img src="../_assets/figure-3-distance-vs-cost.svg" alt="Distance to the user oracle versus cumulative cost: the fused turn buys a few big steps and plateaus above the oracle, while many cheap feedback rounds keep stepping down onto it" width="700">
 <em>Figure 3 (schematic, not plotted from data). Same budget on the x-axis. The fused turn buys a few large, expensive steps and stalls above the oracle — its self-check cannot supply the out-of-distribution information the last gap needs, and can regress (Huang et al. [2]). Splitting the budget into many cheap parallel turns, each re-aimed by feedback, spends the same total but keeps closing the distance because every round injects oracle information the model lacked. Parallelism sets the step <em>rate</em>; feedback sets the step <em>direction</em> — only their product reaches the target.</em>
 </figure>
 
@@ -136,7 +136,7 @@ We report small experiments run within the `tokenmaxxxer` stack. They are consis
 - **A null result, reported.** Adding a security-*steering* directive (direction only, no scan) to vulnerability-prone generation tasks produced **no measurable improvement**: 8/8 secure in both arms, because a frontier generator already selects the secure pattern unprompted. We record this as the in-distribution boundary case of §7, not as a success. *Two initial "failures" were scorer false positives, corrected by inspection; the scorer is grep-based and single-run.*
 
 <figure>
-<img src="assets/figure-4-ablation-speedup.svg" alt="Measured per-task wall-clock speedup of the parallel-generation plugin across 18 tasks: geometric mean 1.50x, one task slower, quality tied at 630 of 632 checks in both arms" width="700">
+<img src="../_assets/figure-4-ablation-speedup.svg" alt="Measured per-task wall-clock speedup of the parallel-generation plugin across 18 tasks: geometric mean 1.50x, one task slower, quality tied at 630 of 632 checks in both arms" width="700">
 <em>Figure 4 (measured, not schematic). Per-task wall-clock speedup from the plugin ablation (first bullet): mean wall-clock with the plugin off divided by mean with it on, per task (18 tasks × 2 arms × 2 reps = 72 headless runs). Geometric mean 1.50× (dashed); one task, <code>dom-infra</code>, ran slower under fan-out — reported, not trimmed. Quality is tied at 630/632 hidden checks passing in each arm, so the speedup is not bought with correctness. Raw data: <code>experiments/results.csv</code> in the research clone.</em>
 </figure>
 
