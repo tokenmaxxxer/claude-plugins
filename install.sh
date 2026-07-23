@@ -75,6 +75,13 @@ if isinstance(enabled, list):
     enabled = {k: True for k in enabled}
 elif not isinstance(enabled, dict):
     enabled = {}
+# Prune keys that earlier installs enabled under names this bundle has since
+# replaced, so a re-run does not leave a dead plugin key alongside the new one.
+superseded = {f"tokenmaxxxer-env@{market}"}
+for stale in list(enabled):
+    if stale in superseded and stale != key:
+        del enabled[stale]
+        print(f"    removed superseded plugin key {stale}")
 enabled[key] = True
 settings["enabledPlugins"] = enabled
 
