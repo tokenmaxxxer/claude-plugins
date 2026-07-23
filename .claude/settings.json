@@ -1,5 +1,16 @@
 {
   "env": {
     "DOCTRINE_ALLOW": "experiments"
+  },
+  "extraKnownMarketplaces": {
+    "tokenmaxxxer": {
+      "source": {
+        "source": "github",
+        "repo": "tokenmaxxxer/claude-plugins"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "tokenmaxxxer-env@tokenmaxxxer": true
   }
 }
