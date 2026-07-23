@@ -35,20 +35,29 @@ The position paper ([*Generation Is All You Need*](docs/reports/generation-is-al
 
 ## Install
 
-One line, no clone (works with the standalone CLI or with only the VSCode extension):
+Run this **inside the repo** you want the stack in (works with the standalone CLI or with only the VSCode extension). By default the installer writes `.claude/settings.json` at the repo root — **project scope** — so committing that one file carries the stack to every session on that repo: local CLI, Claude Code on the web, and Slack cloud sessions alike.
 
 ```
 curl -fsSL https://raw.githubusercontent.com/tokenmaxxxer/claude-plugins/main/install.sh | bash
+git add .claude/settings.json && git commit -m "Add tokenmaxxxer plugin stack"
 ```
 
-Or from any Claude Code session:
+Everyone who opens the repo then gets the `tokenmaxxxer-env` bundle — whose dependencies pull in the whole stack — installed and enabled on session start, after a one-time trust prompt. (The installer refuses to run outside a git repository, so it never scatters a stray settings file.)
+
+Want it on your **account** for every project on this machine instead? That is **user scope** — it applies to local sessions everywhere but does not travel with a repo and does not reach cloud/Slack sessions:
+
+```
+curl -fsSL https://raw.githubusercontent.com/tokenmaxxxer/claude-plugins/main/install.sh | bash -s -- --user
+```
+
+Or, for user scope, from any Claude Code session:
 
 ```
 /plugin marketplace add tokenmaxxxer/claude-plugins
 /plugin install tokenmaxxxer-env@tokenmaxxxer
 ```
 
-Either way you get the `tokenmaxxxer-env` bundle, whose dependencies pull in the whole stack. One interactive step remains: open `/plugin` → marketplaces → tokenmaxxxer and enable **auto-update**, so future stack additions arrive automatically (there is no CLI switch for this toggle). Individual plugins install the same way: `/plugin install terse@tokenmaxxxer`. If an update ever complains about a missing dependency, re-run the install one-liner — it is idempotent and installs the full stack explicitly.
+Either user-scope path gets you the bundle the same way. One interactive step remains there: open `/plugin` → marketplaces → tokenmaxxxer and enable **auto-update**, so future stack additions arrive automatically (there is no CLI switch for this toggle). Individual plugins install the same way: `/plugin install terse@tokenmaxxxer`. If an update ever complains about a missing dependency, re-run the install one-liner — it is idempotent and installs the full stack explicitly.
 
 ## Plugins
 
@@ -67,16 +76,9 @@ Either way you get the `tokenmaxxxer-env` bundle, whose dependencies pull in the
 
 ## Team rollout
 
-The one-liner above installs at **user scope** — your account, your machine. That does **not** reach Claude Code on the web or Slack cloud sessions: those read plugins from the repository, not your account. To carry the stack with a project, put the declaration in that repo's `.claude/settings.json` (**project scope**) and commit it. Everyone who opens the repo — including cloud/Slack sessions — then gets the stack installed and enabled on session start, after a one-time trust prompt. Plugins added to the bundle later reach the team through its version bumps, with no settings change.
+The default project-scope install above is the team rollout: commit the `.claude/settings.json` it writes and everyone who opens the repo — local CLI and cloud/Slack sessions alike — gets the stack installed and enabled on session start, after a one-time trust prompt. Plugins added to the bundle later reach the team through its version bumps, with no settings change. The installer merges into any existing `.claude/settings.json` (existing keys preserved, a `.bak` written), so it is safe to run on a repo that already has one.
 
-Run the installer from inside the project with `--project`, which merges the two keys into `./.claude/settings.json` for you (existing settings preserved, backup written):
-
-```
-curl -fsSL https://raw.githubusercontent.com/tokenmaxxxer/claude-plugins/main/install.sh | bash -s -- --project
-git add .claude/settings.json && git commit -m "Add tokenmaxxxer plugin stack"
-```
-
-Or write the same block by hand:
+Prefer to write the declaration by hand? It is exactly these two keys:
 
 ```json
 {

@@ -4,25 +4,23 @@
 # every plugin in as a dependency), and refreshes the marketplace once.
 #
 # Two scopes:
-#   user (default)      Installs for your account only. Uses a real `claude`
-#                       CLI (standalone, or the binary bundled inside the VSCode
+#   project (default)   Writes .claude/settings.json at the root of the git repo
+#                       you run this in. Commit that file and everyone who opens
+#                       the repo — local CLI, Claude Code on the web, and Slack
+#                       cloud sessions — gets the stack installed and enabled on
+#                       session start. Because the file is shared, the
+#                       marketplace source is always the GitHub repo (a local
+#                       directory path would not resolve elsewhere). Refuses to
+#                       run outside a git repository so a stray settings.json is
+#                       never scattered into an unrelated directory.
+#   user (--user)       Installs for your account only. Uses a real `claude` CLI
+#                       (standalone, or the binary bundled inside the VSCode
 #                       extension) at --scope user, or falls back to writing
-#                       ~/.claude/settings.json directly. Local machine only —
-#                       this scope does NOT reach Claude Code on the web or Slack
-#                       cloud sessions, which read plugins from the repo instead.
-#   project (--project) Writes ./.claude/settings.json in the current directory
-#                       and stops. Commit that file to git and everyone who opens
-#                       the repo — including cloud/Slack sessions — gets the stack
-#                       installed and enabled on session start. Because the file
-#                       is shared, the marketplace source is always the GitHub
-#                       repo (a local directory path would not resolve elsewhere).
+#                       ~/.claude/settings.json directly. Applies on every
+#                       machine-local session but does NOT travel with any repo.
 #
 # Select the scope with --project / --user, or TOKENMAXXXER_SCOPE=project|user.
 # A flag overrides the environment variable.
-#
-# Marketplace source (user scope): the local checkout when this script runs from
-# the repo, otherwise the GitHub repo — so a standalone copy of this script also
-# works.
 set -u
 
 MARKET="tokenmaxxxer"
@@ -31,23 +29,24 @@ GITHUB_REPO="tokenmaxxxer/claude-plugins"
 
 usage() {
   cat <<'USAGE'
-Usage: install.sh [--user | --project]
+Usage: install.sh [--project | --user]
 
-  --user      Install for your account only (default). Local machine; does not
-              reach Claude Code on the web / Slack cloud sessions.
-  --project   Write ./.claude/settings.json in the current directory so the repo
-              carries the stack. Commit it; cloud/Slack sessions pick it up on
-              session start.
+  --project   (default) Write .claude/settings.json at the current git repo root
+              so the repo carries the stack. Commit it; local CLI and cloud/Slack
+              sessions pick it up on session start. Must be run inside a git repo.
+  --user      Install for your account only. Applies to every machine-local
+              session but does not travel with any repo, and does not reach
+              Claude Code on the web / Slack cloud sessions.
   -h, --help  Show this help.
 
 Environment:
-  TOKENMAXXXER_SCOPE=user|project   Same as the flags (a flag overrides it).
+  TOKENMAXXXER_SCOPE=project|user   Same as the flags (a flag overrides it).
   TOKENMAXXXER_SETTINGS_ONLY=1      User scope: skip the CLI and write settings
                                     directly.
 USAGE
 }
 
-SCOPE="${TOKENMAXXXER_SCOPE:-user}"
+SCOPE="${TOKENMAXXXER_SCOPE:-project}"
 while [ $# -gt 0 ]; do
   case "$1" in
     --project) SCOPE="project" ;;
@@ -59,7 +58,7 @@ while [ $# -gt 0 ]; do
 done
 case "$SCOPE" in
   user|project) ;;
-  *) echo "install.sh: TOKENMAXXXER_SCOPE must be 'user' or 'project' (got '$SCOPE')" >&2; exit 2 ;;
+  *) echo "install.sh: TOKENMAXXXER_SCOPE must be 'project' or 'user' (got '$SCOPE')" >&2; exit 2 ;;
 esac
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" 2>/dev/null && pwd || true)"
@@ -127,22 +126,31 @@ PY
 }
 
 if [ "$SCOPE" = "project" ]; then
-  echo "==> installing at PROJECT scope: ./.claude/settings.json"
-  write_settings "./.claude/settings.json" || exit 1
+  # Project settings only matter once committed to a repo, so refuse to scatter
+  # a settings.json into an unrelated directory. Write at the repo root, which
+  # is where Claude Code reads a project's .claude/settings.json from.
+  REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+  if [ -z "$REPO_ROOT" ]; then
+    echo "install.sh: --project must run inside a git repository (none found at $(pwd))." >&2
+    echo "    cd into your project first, or use --user to install for your account." >&2
+    exit 2
+  fi
+  echo "==> installing at PROJECT scope: $REPO_ROOT/.claude/settings.json"
+  write_settings "$REPO_ROOT/.claude/settings.json" || exit 1
   cat <<'MSG'
 ==> done (project scope). The plugin declaration is written, but it only takes
     effect once committed:
         git add .claude/settings.json
         git commit -m "Add tokenmaxxxer plugin stack"
-    After that, anyone who opens this repo — including Claude Code on the web and
-    Slack cloud sessions — gets the stack installed and enabled on session start
-    (after a one-time trust prompt). A user-scope install does NOT reach cloud
-    sessions; this project scope is the one that does.
+    After that, anyone who opens this repo — local CLI, Claude Code on the web,
+    and Slack cloud sessions alike — gets the stack installed and enabled on
+    session start (after a one-time trust prompt). To install for your account
+    machine-wide instead, re-run with: install.sh --user
 MSG
   exit 0
 fi
 
-# ---- user scope (default) --------------------------------------------------
+# ---- user scope (--user) ---------------------------------------------------
 
 find_cli() {
   if command -v claude >/dev/null 2>&1; then
@@ -200,13 +208,13 @@ else
 fi
 
 cat <<'MSG'
-==> done. Start (or reload) a Claude Code session, then:
+==> done (user scope). Start (or reload) a Claude Code session, then:
     - verify with /plugins
     - RECOMMENDED: open /plugin -> marketplaces -> tokenmaxxxer and enable
       auto-update, so future stack additions arrive automatically. There is
       no CLI/config switch for this toggle; it is a one-time interactive step.
     - without auto-update, refresh manually anytime:
       claude plugin update tokenmaxxxer-env@tokenmaxxxer
-    - to install into a project instead (so cloud/Slack sessions get the stack),
-      re-run with: install.sh --project
+    - to carry the stack with a repo instead (so cloud/Slack sessions get it too),
+      run this from inside that repo with no flag (project scope is the default).
 MSG
