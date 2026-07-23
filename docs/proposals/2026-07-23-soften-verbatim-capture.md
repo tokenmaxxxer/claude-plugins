@@ -30,3 +30,7 @@ Reword the verbatim-capture instruction in `warrant/hooks/directive.sh:37` and t
 ## How we'll know it worked
 
 Grep for "quoted verbatim" and "statement of intent" in the plugin sources returns the reworded intent-based phrasing plus a scrub line; no remaining instruction to store the user's message byte-for-byte.
+
+## What did not work
+
+First wording made the scrub and the quote carve-out unordered siblings — a secret that was the load-bearing exact wording was licensed to be quoted verbatim, defeating the scrub; reordered so the scrub runs first and the carve-out is limited to non-sensitive text.
