@@ -1,5 +1,5 @@
 ---
-status: approved
+status: landed
 files:
   - warrant/hooks/directive.sh
   - dispatch/hooks/directive.sh
